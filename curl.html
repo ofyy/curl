@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curl Oluşturucu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #copyButton {
+            background: #28a745;
+        }
+        #copyButton:hover {
+            background: #218838;
+        }
+        pre {
+            background: #333;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>Curl Oluşturucu</h1>
+    <form id="curlForm">
+        <label for="bearerToken">Bearer Token:</label>
+        <input type="text" id="bearerToken" name="bearerToken" required><br>
+
+        <label for="ecrn">Alınacak Dersler:</label>
+        <input type="text" id="ecrn" name="ecrn" required><br>
+
+        <label for="scrn">Silinecek Dersler:</label>
+        <input type="text" id="scrn" name="scrn"><br>
+
+        <button type="button" onclick="generateCurlCommand()">Curl Komutunu Oluştur</button>
+        <button type="button" id="copyButton" onclick="copyToClipboard()">Kopyala</button>
+    </form>
+
+    <h2>Oluşturulan CURL Komutu:</h2>
+    <pre id="curlCommand"></pre>
+
+    <script>
+        function generateCurlCommand() {
+            const bearerToken = document.getElementById('bearerToken').value.trim();
+            const ecrn = document.getElementById('ecrn').value.split(',').map(item => item.trim()).filter(item => item !== "");
+            const scrn = document.getElementById('scrn').value.split(',').map(item => item.trim()).filter(item => item !== "");
+
+            const data = {
+                ECRN: ecrn,
+                SCRN: scrn
+            };
+
+            const curlCommand = `curl -X POST https://kepler-beta.itu.edu.tr/api/ders-kayit/v21/ \\\n` +
+                `-H "Authorization: ${bearerToken}" \\\n` +
+                `-H "Content-Type: application/json" \\\n` +
+                `-d '${JSON.stringify(data)}'`;
+
+            document.getElementById('curlCommand').textContent = curlCommand;
+        }
+
+        function copyToClipboard() {
+            const curlCommandElement = document.getElementById('curlCommand');
+            const range = document.createRange();
+            range.selectNode(curlCommandElement);
+            window.getSelection().removeAllRanges(); 
+            window.getSelection().addRange(range); 
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges(); 
+            alert('Curl komutu kopyalandı!');
+        }
+    </script>
+</body>
+</html>
